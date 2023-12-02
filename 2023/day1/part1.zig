@@ -33,7 +33,6 @@ pub fn main() !void {
                 }
             }
             sum += (first * 10) + last;
-            print("[{}{}]\n", .{first, last});
         }
     }
     print("Sum is {}\n", .{sum});
