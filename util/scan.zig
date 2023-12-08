@@ -5,6 +5,24 @@ const print = std.debug.print;
 // getting familiar with zig, character arrays, arrays, strings ...
 
 pub fn main() !void {
+
+
+    // char arrays (u8) and string stuff
+    // zig doesn't have strings so
+    // quoted text constants in code are just slices of bytes
+
+    const name = "John Doe";
+    print("\n\nname is {s}\n", .{ name });
+    print("-> @TypeOf returns: {}\n",  .{ @TypeOf(name) });
+    print("-> @typeName is   : {s}\n", .{ @typeName(@TypeOf(name))});
+
+    print("\nNote that these string literals are defined as: (in sect 5.3 of zig docs)\n", .{});
+    print(" \"string literals are constant single-item Pointers to null-terminated byte arrays\"\n\n", .{});
+    print("\nThis explains why John Doe is of type of type *const [8:0]u8\n\n", .{});
+
+
+    // technique 1: populate a u8 array with text, then search in it for a substr
+
     const letters: [26]u8 = blk: {
         var arr: [26]u8 = undefined;
         for ("abcdefghijklmnopqrstuvwxyz", 0..) |c, i| { // note how to get index captured
@@ -13,6 +31,9 @@ pub fn main() !void {
         break :blk arr;
     };
     print("{} {} {} {}\n", .{letters[0], letters[1], letters[2], letters[3]});
+
+    // this is interesting in so far as it demonstrates the use of returning memory
+    // while using break and also the :blk syntax ; but very convoluted
 
     const one: [3]u8 = blk: {
         var arr: [3]u8 = undefined;
@@ -25,6 +46,16 @@ pub fn main() !void {
     const ptr: *const [3]u8 = letters[23..26];
     const match: bool = std.mem.startsWith(u8, ptr, &one);
     print("Match -> {}\n", .{match});
+
+    // more concisely lets make a *const [26:0]u8 instead per the next section
+    // much much cleaner
+
+    const letters2 = "abcdefghitwomnopqrstuvwxyz";
+    const two = "two";
+    const match2: bool = std.mem.startsWith(u8, letters2[9..12], two);
+    print("Two in letters2 ? -> {}\n", .{ match2 });
+    print("-> @TypeOf letters2 is {}, length is {d}\n", .{ @TypeOf(letters2), letters2.len });
+    print("-> letter2[26] is available but should be 0, e.g. letters2[26]-> [{}]\n", .{ letters2[26] });
 
     // print out some details
 
@@ -64,4 +95,7 @@ pub fn main() !void {
     print("Multi-Dim Array ma34 is type [ {s} ] :\n", .{@typeName(@TypeOf(ma34))});
     print("    ma34 is {any}, ma34[0][1] = {}\n", .{ma34, ma34[0][1]});
     print("Diag Pattern is: {} {} {}\n", .{ma34[0][1], ma34[1][2], ma34[2][3]});
+
+    // string stuff
+
 }
